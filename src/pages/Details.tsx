@@ -1,28 +1,32 @@
-import getFruits from 'api/getFruits'
-import Head from 'components/Head'
-import ImageAttribution from 'components/ImageAttribution'
-import LoadingOrError from 'components/LoadingOrError'
-import type { ReactElement } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import getCandidates from 'api/getCalon'
+import Head from 'components/Head'
+import LoadingOrError from 'components/LoadingOrError'
+import type React from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
 import { useMediaQuery } from 'utils'
 
 const DESKTOP_IMAGE_WIDTH_PERCENTAGE = 0.4
 const MOBILE_IMAGE_HEIGHT_PERCENTAGE = 0.3
 
-export default function DetailsPage(): ReactElement {
+export default function DetailsPage(): React.ReactElement {
 	const isTabletAndUp = useMediaQuery('(min-width: 600px)')
-	const { fruitName } = useParams()
+	const { candidateName } = useParams()
 
-	const { isLoading, isError, error, data } = useQuery(['fruits'], getFruits)
+	const { isLoading, isError, error, data } = useQuery(
+		['candidates'],
+		getCandidates
+	)
+
 	if (isLoading || isError) {
 		return <LoadingOrError error={error as Error} />
 	}
 
-	const fruit = data.find(
-		f => f.name.toLowerCase() === fruitName?.toLowerCase()
+	const candidate = data.find(
+		c => c.name.toLowerCase() === candidateName?.toLowerCase()
 	)
-	if (!fruit) {
+
+	if (!candidate) {
 		return <Navigate to='/' replace />
 	}
 
@@ -38,20 +42,16 @@ export default function DetailsPage(): ReactElement {
 
 	return (
 		<>
-			<Head title={fruit.name} />
+			<Head title={candidate.name} />
 			<div className='flex min-h-screen flex-col items-center sm:flex-row'>
 				<div className='relative'>
 					<img
-						data-testid='FruitImage'
+						data-testid='CandidateImage'
 						width={imageWidth}
 						height={imageHeight}
-						style={{
-							backgroundColor: fruit.image.color
-						}}
-						src={`${fruit.image.url}&w=${imageWidth}&h=${imageHeight}`}
-						alt={fruit.name}
+						src={`${candidate.image}&w=${imageWidth}&h=${imageHeight}`}
+						alt={candidate.name}
 					/>
-					<ImageAttribution author={fruit.image.author} />
 				</div>
 				<div className='my-8 sm:my-0 sm:ml-16'>
 					<Link data-testid='BackLink' to='/' className='flex items-center'>
@@ -60,30 +60,17 @@ export default function DetailsPage(): ReactElement {
 					</Link>
 
 					<h1
-						data-testid='FruitName'
+						data-testid='CandidateName'
 						className='mt-2 text-6xl font-bold sm:mt-8'
 					>
-						{fruit.name}
+						{candidate.name}
 					</h1>
+					<p className='mt-3 text-lg'>{candidate.desc}</p>
 					<h2 className='mt-3 text-xl text-gray-500 dark:text-gray-400'>
-						Vitamins per 100 g (3.5 oz)
+						Visi dan Misi
 					</h2>
-					<table className='mt-8 text-lg'>
-						<thead>
-							<tr>
-								<th className='px-4 py-2'>Vitamin</th>
-								<th className='px-4 py-2'>Quantity</th>
-							</tr>
-						</thead>
-						<tbody>
-							{fruit.metadata.map(({ name, value }) => (
-								<tr key={`FruitVitamin-${name}`} className='font-medium'>
-									<td className='border border-gray-300 px-4 py-2'>{name}</td>
-									<td className='border border-gray-300 px-4 py-2'>{value}</td>
-								</tr>
-							))}
-						</tbody>
-					</table>
+					<p className='mt-3 text-lg'>{candidate.visi}</p>
+					<p className='mt-3 text-lg'>{candidate.misi}</p>
 				</div>
 			</div>
 		</>
