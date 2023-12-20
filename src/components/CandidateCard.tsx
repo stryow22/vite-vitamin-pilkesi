@@ -36,7 +36,7 @@ const CandidateCard: React.FC<CandidateCardProperties> = ({
 		>
 			<img
 				className='w-full object-cover'
-				src={candidate.image}
+				src={`/images/${candidate.slug}.png`}
 				alt={`${candidate.name} Image`}
 			/>
 
